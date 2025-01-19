@@ -120,7 +120,7 @@ export function NoteEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full min-[640px]">
+    <form onSubmit={handleSubmit} className="w-full">
       <div className="bg-yellow-100/90 dark:bg-yellow-900/20 p-4 rounded-lg shadow-sm size-full">
         <div className="flex gap-1 mb-2 border-b pb-2">
           <Button
@@ -175,7 +175,9 @@ export function NoteEditor({
             <List className="h-4 w-4" />
           </Button>
         </div>
-        <EditorContent editor={editor} />
+        <div className='min-h-[80px]'>
+          <EditorContent editor={editor} />
+        </div>
         <div className="flex justify-end mt-2 space-x-2">
           {showCancelButton && onCancel && (
             <Button
