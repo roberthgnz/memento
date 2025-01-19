@@ -53,18 +53,28 @@ export async function deleteNote(noteId: string) {
   }
 }
 
-export async function getNotesBySyncId(syncId: string) {
+export async function getNotesBySyncId(syncId: string, type: 'all' | 'notes' | 'pinned') {
   try {
-    const { data, error } = await supabase
+    console.log('Fetching notes:', syncId, type);
+
+    let query = supabase
       .from('notes')
       .select('*')
-      .eq('sync_id', syncId)
-      .order('created_at', { ascending: false });
+      .eq('sync_id', syncId); 
+
+    if (type === 'notes') {
+      query = query.eq('is_pinned', false); 
+    } else if (type === 'pinned') {
+      query = query.eq('is_pinned', true); 
+    }
+
+    const { error, data } = await query;
 
     if (error) throw error;
-    
+
     return data as Note[];
   } catch (error) {
+    console.error('Error fetching notes:', error);
     return [];
   }
 }

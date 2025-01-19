@@ -4,8 +4,6 @@ import { getSyncId } from '@/lib/cookies';
 import { NoteDetailView } from '@/components/note-detail-view';
 import type { Note } from '@/types';
 
-export const dynamic = 'force-dynamic';
-
 async function getNote(syncId: string, id: string) {
   try {
     const { data, error } = await supabase

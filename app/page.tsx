@@ -1,20 +1,27 @@
 import { Suspense } from "react";
 import { SyncDialog } from "@/components/sync-dialog";
 import { NotesContainer } from "@/components/notes-container";
-import { getNotesBySyncId, updateSyncId } from "./actions";
+import { updateSyncId } from "./actions";
 import { getSyncId } from "@/lib/cookies";
+import { NotesTabs } from "@/components/notes-tabs";
 
-export const dynamic = 'force-dynamic';
+type SearchPageParams = {
+  type?: 'all' | 'notes' | 'pinned';
+}
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: SearchPageParams }) {
+  const type = searchParams?.type || "all"
+
   const syncId = getSyncId();
-  const initialNotes = await getNotesBySyncId(syncId);
 
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="max-w-2xl mx-auto p-4">
+        <div className="bg-transparent border-b w-full justify-start rounded-none space-x-6 h-12">
+          <NotesTabs currentTab={type} />
+        </div>
         <Suspense fallback={<div>Loading notes...</div>}>
-          <NotesContainer initialNotes={initialNotes} syncId={syncId} />
+          <NotesContainer type={type} syncId={syncId} />
         </Suspense>
       </div>
       <SyncDialog syncId={syncId} onSync={updateSyncId} />

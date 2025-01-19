@@ -2,8 +2,6 @@ import { notFound } from 'next/navigation';
 import { supabase } from "@/lib/supabase";
 import type { Note } from '@/types';
 
-export const dynamic = 'force-dynamic';
-
 async function getPublicNote(id: string) {
   try {
     const { data, error } = await supabase

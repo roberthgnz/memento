@@ -9,7 +9,7 @@ export default function NotFound() {
         <Link href="/">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Notes
+            Back
           </Button>
         </Link>
         <div className="text-center py-8">

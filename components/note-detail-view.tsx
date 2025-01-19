@@ -84,7 +84,7 @@ export function NoteDetailView({ note }: NoteDetailViewProps) {
           <Link href="/">
             <Button variant="ghost">
               <ArrowLeft className="size-4 mr-2" />
-              Back to Notes
+              Back
             </Button>
           </Link>
           <div className="flex items-center gap-2">
