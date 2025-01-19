@@ -59,7 +59,7 @@ export function NotesList({ groups, type }: NotesContainerProps) {
             {groups.map(({ label, notes }) => (
                 <div key={label} className="space-y-2">
                     <div className="text-sm text-muted-foreground font-medium">{label}</div>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {notes.map(note => (
                             <NoteCard
                                 key={note.id}

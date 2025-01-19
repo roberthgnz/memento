@@ -10,9 +10,9 @@ async function getPublicNote(id: string) {
       .eq('id', id)
       .eq('is_public', true)
       .single();
-    
+
     if (error) throw error;
-    
+
     if (!data) return null;
 
     return data as Note;
@@ -29,16 +29,19 @@ export default async function SharedNotePage({ params }: { params: { id: string 
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="max-w-4xl mx-auto p-4 space-y-4">
+        <p className="text-sm text-muted-foreground font-medium">
+          Created on{' '} {new Date(note.created_at).toLocaleDateString()}{' '}
+        </p>
         <div
           className="rounded-lg p-4"
-          style={{ 
+          style={{
             backgroundColor: note.color,
             filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
           }}
         >
-          <div 
+          <div
             className="text-zinc-800 dark:text-zinc-900 prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: note.content }}
           />
