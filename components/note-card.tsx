@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pin, Trash2 } from "lucide-react";
+import { Pin, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { NoteEditor } from "@/components/note-editor";
 import type { Note } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface NoteCardProps {
   note: Note;
@@ -89,7 +90,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
       ) : (
         <>
           <div 
-            className="text-zinc-800 dark:text-zinc-900 mb-3 cursor-pointer"
+            className="text-zinc-800 dark:text-zinc-900 mb-3 cursor-pointer prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: note.content }}
             style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
             onClick={() => setIsEditing(true)}
@@ -99,6 +100,15 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
               {format(new Date(note.date), 'MMM d, yyyy')}
             </span>
             <div className="flex items-center space-x-2">
+              <Link href={`/note/${note.id}`} target="_blank">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
