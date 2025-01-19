@@ -3,6 +3,7 @@ import { NotesList } from "./notes-list";
 
 import { format, isToday, isYesterday, isThisWeek, isThisMonth } from "date-fns";
 import { Note, GroupedNotes } from "@/types";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NotesContainerProps {
   type: 'all' | 'notes' | 'pinned';
@@ -52,5 +53,8 @@ export async function NotesContainer({ type, syncId }: NotesContainerProps) {
     return 0;
   });
 
-  return <NotesList groups={grouped} type={type} />;
+  return <ScrollArea className="h-[60vh] [&>div]:px-2">
+    <NotesList groups={grouped} type={type} />
+  </ScrollArea>
+
 }
