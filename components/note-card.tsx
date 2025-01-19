@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pin, Trash2, ExternalLink } from "lucide-react";
+import { Pin, Trash2, ExternalLink, LoaderIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { NoteEditor } from "@/components/note-editor";
@@ -106,7 +106,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
                   size="icon"
                   className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink className="size-4" />
                 </Button>
               </Link>
               <Button
@@ -116,7 +116,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
                 onClick={handlePin}
                 disabled={isPending}
               >
-                <Pin className={`h-4 w-4 ${note.isPinned ? 'fill-current' : ''}`} />
+                {isPending ? <LoaderIcon className="size-4 animate-spin" /> : <Pin className={`size-4 ${note.isPinned ? 'fill-current' : ''}`} />}
               </Button>
               <Button
                 variant="ghost"
@@ -125,7 +125,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
                 onClick={handleDelete}
                 disabled={isPending}
               >
-                <Trash2 className="h-4 w-4" />
+                {isPending ? <LoaderIcon className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
               </Button>
             </div>
           </div>
