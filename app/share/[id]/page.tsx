@@ -8,7 +8,7 @@ async function getPublicNote(id: string) {
   try {
     const { data, error } = await supabase
       .from('notes')
-      .select('id, content, color, created_at, is_pinned')
+      .select('*')
       .eq('id', id)
       .eq('is_public', true)
       .single();
@@ -17,13 +17,7 @@ async function getPublicNote(id: string) {
     
     if (!data) return null;
 
-    return {
-      id: data.id,
-      content: data.content,
-      color: data.color,
-      date: data.created_at,
-      isPinned: data.is_pinned
-    } as Note;
+    return data as Note;
   } catch (error) {
     return null;
   }
