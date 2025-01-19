@@ -35,7 +35,7 @@ export function NoteEditor({
 }: NoteEditorProps) {
   const [isPending, startTransition] = useTransition();
 
-  const [_, setContent] = useState(initialContent);
+  const [content, setContent] = useState(initialContent);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -50,13 +50,14 @@ export function NoteEditor({
         class: 'w-full min-h-[80px] focus:outline-none prose prose-sm max-w-none prose-yellow dark:prose-invert',
       },
     },
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML() as string);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editor?.getHTML()) {
-      const content = editor.getHTML() as string;
-      setContent(content);
       if (isEditing) {
         handleUpdate(content);
       } else {
@@ -194,7 +195,7 @@ export function NoteEditor({
             type="submit"
             size="sm"
             className="bg-transparent hover:bg-yellow-200/50 dark:hover:bg-yellow-800/30 text-yellow-800 dark:text-yellow-200"
-            disabled={isPending}
+            disabled={isPending || !content}
           >
             {!showCancelButton && <Plus className="w-4 h-4 mr-2" />}
             {showCancelButton ? 'Save' : 'Add'}

@@ -3,6 +3,7 @@ import { NotesContainer } from "@/components/notes-container";
 import { getSyncId } from "@/lib/cookies";
 import { NotesTabs } from "@/components/notes-tabs";
 import { NoteEditor } from "@/components/note-editor";
+import { NotesListSkeleton } from "@/components/notes-list skeleton";
 
 type SearchPageParams = {
   type?: 'all' | 'notes' | 'pinned';
@@ -22,7 +23,7 @@ export default async function Home({ searchParams }: { searchParams: SearchPageP
         <div className="mb-6">
           <NoteEditor type={type} syncId={syncId} />
         </div>
-        <Suspense fallback={<div>Loading notes...</div>}>
+        <Suspense fallback={<NotesListSkeleton />}>
           <NotesContainer type={type} syncId={syncId} />
         </Suspense>
       </div>
