@@ -33,6 +33,7 @@ export function AuthButton({ user }: { user: any }) {
             setIsLoading(true);
             await signOut();
             toast.success("Signed out successfully");
+            window.location.href = "/";
         } catch (error) {
             toast.error("Sign out failed");
         } finally {
@@ -49,10 +50,16 @@ export function AuthButton({ user }: { user: any }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 {user ? (
-                    <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-                        <LogOut className="mr-2 size-4" />
-                        Sign out
-                    </DropdownMenuItem>
+                    <>
+                        <DropdownMenuItem disabled>
+                            <User className="mr-2 size-4" />
+                            {user.email}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                            <LogOut className="mr-2 size-4" />
+                            Sign out
+                        </DropdownMenuItem></>
                 ) : (<><DropdownMenuItem onClick={() => handleSignIn("github")}>
                     <Github className="mr-2 size-4" />
                     Sign in with GitHub
