@@ -7,7 +7,7 @@ import { NoteCard } from "@/components/note-card";
 import { generateId, getRandomColor } from "@/lib/utils";
 import type { Note } from "@/types";
 import { createNote, updateNote, deleteNote } from "@/app/actions";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface NotesContainerProps {
   initialNotes: Note[];
@@ -17,7 +17,6 @@ interface NotesContainerProps {
 export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   const [notes, setNotes] = useState(initialNotes);
   const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
 
   const handleCreateNote = async (content: string) => {
     const newNote: Note = {
@@ -33,18 +32,15 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
         const result = await createNote(syncId, newNote);
         if (result.success) {
           setNotes(prev => [newNote, ...prev]);
-          toast({
-            title: "Note created",
+          toast.success("Note created", {
             description: "Your note has been added.",
           });
         } else {
           throw new Error("Failed to create note");
         }
       } catch (error) {
-        toast({
-          title: "Creation failed",
+        toast.error("Creation failed", {
           description: "Could not create the note.",
-          variant: "destructive",
         });
       }
     });
@@ -60,17 +56,15 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
       try {
         const result = await updateNote(syncId, updatedNote);
         if (result.success) {
-          setNotes(prev => prev.map(note => 
+          setNotes(prev => prev.map(note =>
             note.id === id ? updatedNote : note
           ));
         } else {
           throw new Error("Failed to update note");
         }
       } catch (error) {
-        toast({
-          title: "Update failed",
+        toast.error("Update failed", {
           description: "Could not update the note.",
-          variant: "destructive",
         });
       }
     });
@@ -86,17 +80,15 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
       try {
         const result = await updateNote(syncId, updatedNote);
         if (result.success) {
-          setNotes(prev => prev.map(note => 
+          setNotes(prev => prev.map(note =>
             note.id === id ? updatedNote : note
           ));
         } else {
           throw new Error("Failed to update note");
         }
       } catch (error) {
-        toast({
-          title: "Action failed",
+        toast.error("Action failed", {
           description: "Could not pin/unpin the note.",
-          variant: "destructive",
         });
       }
     });
@@ -114,10 +106,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
           throw new Error("Failed to delete note");
         }
       } catch (error) {
-        toast({
-          title: "Delete failed",
+        toast.error("Delete failed", {
           description: "Could not delete the note.",
-          variant: "destructive",
         });
       }
     });
@@ -129,19 +119,19 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   return (
     <Tabs defaultValue="all" className="space-y-4">
       <TabsList className="bg-transparent border-b w-full justify-start rounded-none space-x-6 h-12">
-        <TabsTrigger 
-          value="all" 
+        <TabsTrigger
+          value="all"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
         >
           All
         </TabsTrigger>
-        <TabsTrigger 
+        <TabsTrigger
           value="notes"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
         >
           Notes
         </TabsTrigger>
-        <TabsTrigger 
+        <TabsTrigger
           value="pinned"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
         >

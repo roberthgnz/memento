@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { NoteEditor } from "@/components/note-editor";
 import type { Note } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import Link from "next/link";
 
 interface NoteCardProps {
@@ -19,22 +19,18 @@ interface NoteCardProps {
 export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
 
   const handleUpdate = async (content: string) => {
     startTransition(async () => {
       try {
         await onUpdate(note.id, content);
         setIsEditing(false);
-        toast({
-          title: "Note updated",
+         toast.success("Note updated", {
           description: "Your changes have been saved.",
         });
       } catch (error) {
-        toast({
-          title: "Update failed",
+         toast.error("Update failed", {
           description: "Could not save your changes.",
-          variant: "destructive",
         });
       }
     });
@@ -45,10 +41,8 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
       try {
         await onPin(note.id);
       } catch (error) {
-        toast({
-          title: "Action failed",
+       toast.error("Action failed", {
           description: "Could not pin/unpin the note.",
-          variant: "destructive",
         });
       }
     });
@@ -58,15 +52,12 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
     startTransition(async () => {
       try {
         await onDelete(note.id);
-        toast({
-          title: "Note deleted",
+        toast.success("Note deleted", {
           description: "Your note has been removed.",
         });
       } catch (error) {
-        toast({
-          title: "Delete failed",
+         toast.error("Delete failed", {
           description: "Could not delete the note.",
-          variant: "destructive",
         });
       }
     });

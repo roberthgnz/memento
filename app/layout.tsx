@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from 'sonner';
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,7 +30,7 @@ export default function RootLayout({
             <ThemeToggle />
             {children}
           </div>
-          <Toaster />
+          <Toaster richColors closeButton />
         </ThemeProvider>
       </body>
     </html>

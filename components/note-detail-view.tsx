@@ -6,7 +6,7 @@ import { ArrowLeft, Edit2, Save, Share2, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { NoteEditor } from '@/components/note-editor';
 import { updateNote } from '@/app/actions';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 import type { Note } from '@/types';
 
 interface NoteDetailViewProps {
@@ -17,7 +17,6 @@ interface NoteDetailViewProps {
 
 export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const { toast } = useToast();
 
   const handleUpdate = async (content: string) => {
     try {
@@ -26,18 +25,15 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
       
       if (result.success) {
         setIsEditing(false);
-        toast({
-          title: "Note updated",
+           toast.success("Note updated", {
           description: "Your changes have been saved.",
         });
       } else {
         throw new Error("Failed to update note");
       }
     } catch (error) {
-      toast({
-        title: "Update failed",
+        toast.error("Update failed", {
         description: "Could not save your changes.",
-        variant: "destructive",
       });
     }
   };
@@ -47,8 +43,7 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
       const result = await updateNote(syncId, note, !isPublic);
       
       if (result.success) {
-        toast({
-          title: isPublic ? "Note made private" : "Note made public",
+        toast.success(isPublic ? "Note made private" : "Note made public", {
           description: isPublic 
             ? "Your note is no longer publicly accessible."
             : "Your note can now be accessed via a public link.",
@@ -57,19 +52,16 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
         throw new Error("Failed to update note");
       }
     } catch (error) {
-      toast({
-        title: "Update failed",
+        toast.error("Update failed", {
         description: "Could not update sharing settings.",
-        variant: "destructive",
       });
     }
   };
 
-  const copyShareLink = () => {
+  const copyShareLink = async () => {
     const shareUrl = `${window.location.origin}/share/${note.id}`;
-    navigator.clipboard.writeText(shareUrl);
-    toast({
-      title: "Link copied",
+    await navigator.clipboard.writeText(shareUrl);
+     toast.success("Link copied", {
       description: "Share link has been copied to clipboard.",
     });
   };
