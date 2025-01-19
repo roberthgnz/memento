@@ -8,9 +8,9 @@ async function getPublicNote(id: string) {
   try {
     const { data, error } = await supabase
       .from('notes')
-      .select('note_data')
+      .select('note_data, is_public')
       .eq('note_data->>id', id)
-      .eq('note_data->>isPublic', true)
+      .eq('is_public', true)
       .single();
     
     if (error) throw error;

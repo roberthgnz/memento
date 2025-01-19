@@ -12,16 +12,17 @@ import type { Note } from '@/types';
 interface NoteDetailViewProps {
   note: Note;
   syncId: string;
+  isPublic: boolean;
 }
 
-export function NoteDetailView({ note, syncId }: NoteDetailViewProps) {
+export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
   const handleUpdate = async (content: string) => {
     try {
       const updatedNote = { ...note, content, date: new Date() };
-      const result = await updateNote(syncId, updatedNote);
+      const result = await updateNote(syncId, updatedNote, isPublic);
       
       if (result.success) {
         setIsEditing(false);
@@ -43,13 +44,12 @@ export function NoteDetailView({ note, syncId }: NoteDetailViewProps) {
 
   const togglePublic = async () => {
     try {
-      const updatedNote = { ...note, isPublic: !note.isPublic };
-      const result = await updateNote(syncId, updatedNote);
+      const result = await updateNote(syncId, note, !isPublic);
       
       if (result.success) {
         toast({
-          title: note.isPublic ? "Note made private" : "Note made public",
-          description: note.isPublic 
+          title: isPublic ? "Note made private" : "Note made public",
+          description: isPublic 
             ? "Your note is no longer publicly accessible."
             : "Your note can now be accessed via a public link.",
         });
@@ -90,9 +90,9 @@ export function NoteDetailView({ note, syncId }: NoteDetailViewProps) {
               onClick={togglePublic}
             >
               <Share2 className="w-4 h-4 mr-2" />
-              {note.isPublic ? 'Make Private' : 'Make Public'}
+              {isPublic ? 'Make Private' : 'Make Public'}
             </Button>
-            {note.isPublic && (
+            {isPublic && (
               <Button
                 variant="outline"
                 onClick={copyShareLink}

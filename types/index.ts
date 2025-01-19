@@ -4,5 +4,4 @@ export type Note = {
   color: string;
   date: Date;
   isPinned: boolean;
-  isPublic?: boolean;
 };

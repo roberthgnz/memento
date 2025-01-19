@@ -10,9 +10,10 @@ export async function createNote(syncId: string, note: Note) {
   try {
     const { error } = await supabase
       .from('notes')
-      .upsert([{
+      .insert([{
         sync_id: syncId,
-        note_data: note
+        note_data: note,
+        is_public: false
       }]);
     if (error) throw error;
     revalidatePath('/');
@@ -22,7 +23,7 @@ export async function createNote(syncId: string, note: Note) {
   }
 }
 
-export async function updateNote(syncId: string, note: Note) {
+export async function updateNote(syncId: string, note: Note, isPublic?: boolean) {
   try {
     // First, find the existing record
     const { data: existingNote, error: findError } = await supabase
@@ -34,11 +35,16 @@ export async function updateNote(syncId: string, note: Note) {
 
     if (findError) throw findError;
 
+    const updateData = {
+      note_data: note,
+      ...(typeof isPublic === 'boolean' ? { is_public: isPublic } : {})
+    };
+
     // If the note exists, update it
     if (existingNote) {
       const { error: updateError } = await supabase
         .from('notes')
-        .update({ note_data: note })
+        .update(updateData)
         .eq('sync_id', syncId)
         .eq('note_data->>id', note.id);
 
@@ -47,7 +53,10 @@ export async function updateNote(syncId: string, note: Note) {
       // If the note doesn't exist, insert it
       const { error: insertError } = await supabase
         .from('notes')
-        .insert([{ sync_id: syncId, note_data: note }]);
+        .insert([{ 
+          sync_id: syncId, 
+          ...updateData
+        }]);
 
       if (insertError) throw insertError;
     }
@@ -66,7 +75,8 @@ export async function deleteNote(syncId: string, notes: Note[]) {
       .upsert(
         notes.map(note => ({
           sync_id: syncId,
-          note_data: note
+          note_data: note,
+          is_public: false
         }))
       );
     if (error) throw error;

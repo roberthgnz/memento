@@ -100,7 +100,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
               {format(new Date(note.date), 'MMM d, yyyy')}
             </span>
             <div className="flex items-center space-x-2">
-              <Link href={`/note/${note.id}`} target="_blank">
+              <Link href={`/note/${note.id}`}>
                 <Button
                   variant="ghost"
                   size="icon"
