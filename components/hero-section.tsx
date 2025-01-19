@@ -283,7 +283,7 @@ export function HeroSection() {
                             variants={itemVariants}
                             className="text-3xl font-bold mb-12"
                         >
-                            Features you'll love
+                            Features you&apos;ll love
                         </motion.h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {features.map((feature, index) => (
