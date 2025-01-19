@@ -38,7 +38,7 @@ export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="fixed bottom-4 right-4">
+        <Button size={'sm'} variant="outline">
           <Smartphone className="w-4 h-4 mr-2" />
           Sync
         </Button>

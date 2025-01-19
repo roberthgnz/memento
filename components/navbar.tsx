@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 import { StickyNote } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { SyncDialog } from "./sync-dialog";
+import { updateSyncId } from "@/app/actions";
 
-export function Navbar() {
+export function Navbar({ syncId }: { syncId: string }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -34,6 +36,7 @@ export function Navbar() {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-2">
+            <SyncDialog syncId={syncId} onSync={updateSyncId} />
             <ThemeToggle />
           </nav>
         </div>
