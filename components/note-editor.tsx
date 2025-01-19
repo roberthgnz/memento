@@ -4,7 +4,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import BulletList from '@tiptap/extension-bullet-list';
-import ListItem from '@tiptap/extension-list-item';
 import { Bold, Italic, Underline as UnderlineIcon, List, Strikethrough, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,11 +21,11 @@ export function NoteEditor({
   showCancelButton = false 
 }: NoteEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Underline,
       BulletList,
-      ListItem,
     ],
     content: initialContent,
     editorProps: {
