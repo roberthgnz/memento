@@ -1,11 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 import { Navbar } from "@/components/navbar";
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Memento',
@@ -19,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={GeistSans.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
