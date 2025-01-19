@@ -10,7 +10,7 @@ import Link from "next/link";
 
 interface NoteCardProps {
   note: Note;
-  onPin: (id: string) => Promise<void>;
+  onPin: (id: string, is_pinned: boolean) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onUpdate: (id: string, content: string) => Promise<void>;
   isPending: boolean;
@@ -61,7 +61,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAc
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => onPin(note.id)}
+                onClick={() => onPin(note.id, !note.is_pinned)}
                 disabled={isPending}
               >
                 {isPending && pendingAction === 'pin' ? (

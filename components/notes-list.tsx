@@ -4,18 +4,18 @@ import { useState, useTransition } from "react";
 import { NoteEditor } from "@/components/note-editor";
 import { NoteCard } from "@/components/note-card";
 import { getRandomColor } from "@/lib/utils";
-import type { Note } from "@/types";
+import type { GroupedNotes } from "@/types";
 import { createNote, updateNote, deleteNote } from "@/app/actions";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
 
 interface NotesContainerProps {
-    notes: Note[];
+    groups: GroupedNotes[];
     type: 'all' | 'notes' | 'pinned';
     syncId: string;
 }
 
-export function NotesList({ notes, type, syncId }: NotesContainerProps) {
+export function NotesList({ groups, type, syncId }: NotesContainerProps) {
     const [isPending, startTransition] = useTransition();
     const [pendingAction, setPendingAction] = useState<'pin' | 'delete' | 'update' | null>(null);
 
@@ -48,13 +48,10 @@ export function NotesList({ notes, type, syncId }: NotesContainerProps) {
     };
 
     const handleUpdateNote = async (id: string, content: string) => {
-        const noteToUpdate = notes.find(note => note.id === id);
-        if (!noteToUpdate) return;
-        const updatedNote = { ...noteToUpdate, content };
         setPendingAction('update');
         startTransition(async () => {
             try {
-                const result = await updateNote(id, updatedNote);
+                const result = await updateNote(id, { content });
                 if (!result.success) {
                     throw result.error
                 }
@@ -69,14 +66,11 @@ export function NotesList({ notes, type, syncId }: NotesContainerProps) {
         });
     };
 
-    const handleTogglePin = async (id: string) => {
-        const noteToUpdate = notes.find(note => note.id === id);
-        if (!noteToUpdate) return;
-        const updatedNote = { ...noteToUpdate, is_pinned: !noteToUpdate.is_pinned };
+    const handleTogglePin = async (id: string, is_pinned: boolean) => {
         setPendingAction('pin');
         startTransition(async () => {
             try {
-                const result = await updateNote(id, updatedNote);
+                const result = await updateNote(id, { is_pinned });
                 if (!result.success) {
                     throw result.error
                 }
@@ -116,18 +110,24 @@ export function NotesList({ notes, type, syncId }: NotesContainerProps) {
                 <NoteEditor onSubmit={handleCreateNote} />
             </div>
 
-            <div className="space-y-2">
-                <div className="text-sm text-muted-foreground font-medium">TODAY</div>
-                {notes.map((note) => (
-                    <NoteCard
-                        key={note.id}
-                        note={note}
-                        onPin={handleTogglePin}
-                        onDelete={handleDeleteNote}
-                        onUpdate={handleUpdateNote}
-                        isPending={isPending}
-                        pendingAction={pendingAction}
-                    />
+            <div className="space-y-4">
+                {groups.map(({ label, notes }) => (
+                    <div key={label} className="space-y-2">
+                        <div className="text-sm text-muted-foreground font-medium">{label}</div>
+                        <div className="space-y-2">
+                            {notes.map(note => (
+                                <NoteCard
+                                    key={note.id}
+                                    note={note}
+                                    isPending={isPending}
+                                    pendingAction={pendingAction}
+                                    onUpdate={handleUpdateNote}
+                                    onPin={handleTogglePin}
+                                    onDelete={handleDeleteNote}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 ))}
             </div>
         </>

@@ -21,7 +21,7 @@ export async function createNote(note: Partial<Note>) {
   }
 }
 
-export async function updateNote(noteId: string, note: Note) {
+export async function updateNote(noteId: string, note: Partial<Note>) {
   try {
     const { error } = await supabase
       .from('notes')

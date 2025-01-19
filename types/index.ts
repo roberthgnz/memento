@@ -7,3 +7,8 @@ export type Note = {
   is_pinned: boolean;
   is_public: boolean;
 };
+
+export type GroupedNotes = {
+  label: string;
+  notes: Note[];
+}
