@@ -51,15 +51,18 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   };
 
   const handleUpdateNote = async (id: string, content: string) => {
-    const updatedNotes = notes.map(note =>
-      note.id === id ? { ...note, content, date: new Date() } : note
-    );
+    const noteToUpdate = notes.find(note => note.id === id);
+    if (!noteToUpdate) return;
+
+    const updatedNote = { ...noteToUpdate, content, date: new Date() };
 
     startTransition(async () => {
       try {
-        const result = await updateNote(syncId, updatedNotes);
+        const result = await updateNote(syncId, updatedNote);
         if (result.success) {
-          setNotes(updatedNotes);
+          setNotes(prev => prev.map(note => 
+            note.id === id ? updatedNote : note
+          ));
         } else {
           throw new Error("Failed to update note");
         }
@@ -74,15 +77,18 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   };
 
   const handleTogglePin = async (id: string) => {
-    const updatedNotes = notes.map(note =>
-      note.id === id ? { ...note, isPinned: !note.isPinned } : note
-    );
+    const noteToUpdate = notes.find(note => note.id === id);
+    if (!noteToUpdate) return;
+
+    const updatedNote = { ...noteToUpdate, isPinned: !noteToUpdate.isPinned };
 
     startTransition(async () => {
       try {
-        const result = await updateNote(syncId, updatedNotes);
+        const result = await updateNote(syncId, updatedNote);
         if (result.success) {
-          setNotes(updatedNotes);
+          setNotes(prev => prev.map(note => 
+            note.id === id ? updatedNote : note
+          ));
         } else {
           throw new Error("Failed to update note");
         }

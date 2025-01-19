@@ -22,17 +22,36 @@ export async function createNote(syncId: string, note: Note) {
   }
 }
 
-export async function updateNote(syncId: string, notes: Note[]) {
+export async function updateNote(syncId: string, note: Note) {
   try {
-    const { error } = await supabase
+    // First, find the existing record
+    const { data: existingNote, error: findError } = await supabase
       .from('notes')
-      .upsert(
-        notes.map(note => ({
-          sync_id: syncId,
-          note_data: note
-        }))
-      );
-    if (error) throw error;
+      .select()
+      .eq('sync_id', syncId)
+      .eq('note_data->>id', note.id)
+      .single();
+
+    if (findError) throw findError;
+
+    // If the note exists, update it
+    if (existingNote) {
+      const { error: updateError } = await supabase
+        .from('notes')
+        .update({ note_data: note })
+        .eq('sync_id', syncId)
+        .eq('note_data->>id', note.id);
+
+      if (updateError) throw updateError;
+    } else {
+      // If the note doesn't exist, insert it
+      const { error: insertError } = await supabase
+        .from('notes')
+        .insert([{ sync_id: syncId, note_data: note }]);
+
+      if (insertError) throw insertError;
+    }
+
     revalidatePath('/');
     return { success: true };
   } catch (error) {
