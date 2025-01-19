@@ -80,3 +80,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply min-h-[80px] focus:outline-none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-yellow-800/50 dark:text-yellow-200/50 float-left h-0 pointer-events-none;
+}
+
+[data-active="true"] {
+  @apply bg-yellow-200/50 dark:bg-yellow-800/30;
+}

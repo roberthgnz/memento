@@ -1,7 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-import { Bold, Italic, Underline, List, Strikethrough, Plus } from "lucide-react";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import BulletList from '@tiptap/extension-bullet-list';
+import ListItem from '@tiptap/extension-list-item';
+import { Bold, Italic, Underline as UnderlineIcon, List, Strikethrough, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface NoteEditorProps {
@@ -17,20 +21,27 @@ export function NoteEditor({
   onCancel, 
   showCancelButton = false 
 }: NoteEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      BulletList,
+      ListItem,
+    ],
+    content: initialContent,
+    editorProps: {
+      attributes: {
+        class: 'w-full min-h-[80px] focus:outline-none prose prose-sm max-w-none prose-yellow dark:prose-invert',
+      },
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editorRef.current?.innerHTML.trim()) {
-      onSubmit(editorRef.current.innerHTML);
-      if (editorRef.current) {
-        editorRef.current.innerHTML = "";
-      }
+    if (editor?.getHTML()) {
+      onSubmit(editor.getHTML());
+      editor.commands.clearContent();
     }
-  };
-
-  const formatText = (command: string) => {
-    document.execCommand(command, false);
   };
 
   return (
@@ -42,7 +53,8 @@ export function NoteEditor({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => formatText('bold')}
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            data-active={editor?.isActive('bold')}
           >
             <Bold className="h-4 w-4" />
           </Button>
@@ -51,7 +63,8 @@ export function NoteEditor({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => formatText('italic')}
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            data-active={editor?.isActive('italic')}
           >
             <Italic className="h-4 w-4" />
           </Button>
@@ -60,16 +73,18 @@ export function NoteEditor({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => formatText('underline')}
+            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+            data-active={editor?.isActive('underline')}
           >
-            <Underline className="h-4 w-4" />
+            <UnderlineIcon className="h-4 w-4" />
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => formatText('strikeThrough')}
+            onClick={() => editor?.chain().focus().toggleStrike().run()}
+            data-active={editor?.isActive('strike')}
           >
             <Strikethrough className="h-4 w-4" />
           </Button>
@@ -79,19 +94,13 @@ export function NoteEditor({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => formatText('insertUnorderedList')}
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            data-active={editor?.isActive('bulletList')}
           >
             <List className="h-4 w-4" />
           </Button>
         </div>
-        <div
-          ref={editorRef}
-          contentEditable
-          className="w-full min-h-[80px] focus:outline-none empty:before:content-[attr(placeholder)] empty:before:text-yellow-800/50 dark:empty:before:text-yellow-200/50"
-          placeholder="Add note..."
-          dangerouslySetInnerHTML={{ __html: initialContent }}
-          style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
-        />
+        <EditorContent editor={editor} />
         <div className="flex justify-end mt-2 space-x-2">
           {showCancelButton && onCancel && (
             <Button 
