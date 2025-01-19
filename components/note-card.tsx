@@ -20,10 +20,9 @@ interface NoteCardProps {
 export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAction }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-
   return (
     <div
-      className="rounded-lg p-4 relative group transition-colors"
+      className={"rounded-lg p-4 relative group transition-colors"}
       style={{
         backgroundColor: note.color,
         filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
