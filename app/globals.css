@@ -91,11 +91,19 @@
   @apply text-yellow-800/50 dark:text-yellow-200/50 float-left h-0 pointer-events-none;
 }
 
-.ProseMirror ul, .ProseMirror ol {
-  @apply list-inside list-disc;
-}
-
 [data-active="true"] {
   @apply bg-yellow-200/50 dark:bg-yellow-800/30;
 }
 
+/* List Item Styles */
+.ProseMirror ul {
+  @apply list-disc pl-6 my-2;
+}
+
+.ProseMirror li {
+  @apply my-1;
+}
+
+.ProseMirror li.list-item {
+  @apply block;
+}
