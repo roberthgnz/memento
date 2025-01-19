@@ -1,7 +1,5 @@
 import { Suspense } from "react";
-import { SyncDialog } from "@/components/sync-dialog";
 import { NotesContainer } from "@/components/notes-container";
-import { updateSyncId } from "./actions";
 import { getSyncId } from "@/lib/cookies";
 import { NotesTabs } from "@/components/notes-tabs";
 import { NoteEditor } from "@/components/note-editor";
@@ -28,7 +26,6 @@ export default async function Home({ searchParams }: { searchParams: SearchPageP
           <NotesContainer type={type} syncId={syncId} />
         </Suspense>
       </div>
-      <SyncDialog syncId={syncId} onSync={updateSyncId} />
     </div>
   );
 }

@@ -4,6 +4,9 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 import { Navbar } from "@/components/navbar";
+import { updateSyncId } from "./actions";
+import { SyncDialog } from "@/components/sync-dialog";
+import { getSyncId } from "@/lib/cookies";
 
 export const metadata: Metadata = {
   title: 'Memento',
@@ -15,6 +18,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const syncId = getSyncId();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
@@ -31,6 +36,7 @@ export default function RootLayout({
             </main>
           </div>
           <Toaster richColors closeButton />
+          <SyncDialog syncId={syncId} onSync={updateSyncId} />
         </ThemeProvider>
       </body>
     </html>
