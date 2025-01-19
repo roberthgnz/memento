@@ -6,62 +6,31 @@ import { setSyncId } from "@/lib/cookies";
 import { redirect } from "next/navigation";
 import type { Note } from "@/types";
 
-export async function createNote(syncId: string, note: Note) {
+export async function createNote(note: Partial<Note>) {
   try {
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('notes')
-      .insert([{
-        sync_id: syncId,
-        note_data: note,
-        is_public: false
-      }]);
+      .insert([note]).select().order('created_at', { ascending: false });
+
     if (error) throw error;
     revalidatePath('/');
-    return { success: true };
+    
+    return { success: true, data };
   } catch (error) {
     return { success: false, error };
   }
 }
 
-export async function updateNote(syncId: string, note: Note, isPublic?: boolean) {
+export async function updateNote(noteId: string, note: Note) {
   try {
-    // First, find the existing record
-    const { data: existingNote, error: findError } = await supabase
+    const { error } = await supabase
       .from('notes')
-      .select()
-      .eq('sync_id', syncId)
-      .eq('note_data->>id', note.id)
-      .single();
+      .update(note)
+      .eq('id', noteId);
 
-    if (findError) throw findError;
-
-    const updateData = {
-      note_data: note,
-      ...(typeof isPublic === 'boolean' ? { is_public: isPublic } : {})
-    };
-
-    // If the note exists, update it
-    if (existingNote) {
-      const { error: updateError } = await supabase
-        .from('notes')
-        .update(updateData)
-        .eq('sync_id', syncId)
-        .eq('note_data->>id', note.id);
-
-      if (updateError) throw updateError;
-    } else {
-      // If the note doesn't exist, insert it
-      const { error: insertError } = await supabase
-        .from('notes')
-        .insert([{ 
-          sync_id: syncId, 
-          ...updateData
-        }]);
-
-      if (insertError) throw insertError;
-    }
-
+    if (error) throw error;
     revalidatePath('/');
+
     return { success: true };
   } catch (error) {
     return { success: false, error };
@@ -73,10 +42,11 @@ export async function deleteNote(noteId: string) {
     const { error } = await supabase
       .from('notes')
       .delete()
-      .eq('note_data->>id', noteId);
+      .eq('id', noteId);
 
     if (error) throw error;
     revalidatePath('/');
+
     return { success: true };
   } catch (error) {
     return { success: false, error };
@@ -87,12 +57,13 @@ export async function getNotesBySyncId(syncId: string) {
   try {
     const { data, error } = await supabase
       .from('notes')
-      .select('note_data')
+      .select('*')
       .eq('sync_id', syncId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data?.map(row => row.note_data as Note) || [];
+    
+    return data as Note[];
   } catch (error) {
     return [];
   }

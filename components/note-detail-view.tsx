@@ -2,37 +2,44 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit2, Save, Share2, Copy } from 'lucide-react';
+import { ArrowLeft, Edit2, Save, Copy, EyeOffIcon, EyeIcon } from 'lucide-react';
 import Link from 'next/link';
 import { NoteEditor } from '@/components/note-editor';
 import { updateNote } from '@/app/actions';
 import { toast } from "sonner";
 import type { Note } from '@/types';
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+
 interface NoteDetailViewProps {
   note: Note;
-  syncId: string;
-  isPublic: boolean;
 }
 
-export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) {
+export function NoteDetailView({ note }: NoteDetailViewProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleUpdate = async (content: string) => {
     try {
       const updatedNote = { ...note, content, date: new Date() };
-      const result = await updateNote(syncId, updatedNote, isPublic);
-      
+      const result = await updateNote(note.id, updatedNote);
+
       if (result.success) {
         setIsEditing(false);
-           toast.success("Note updated", {
+        toast.success("Note updated", {
           description: "Your changes have been saved.",
         });
       } else {
         throw new Error("Failed to update note");
       }
     } catch (error) {
-        toast.error("Update failed", {
+      toast.error("Update failed", {
         description: "Could not save your changes.",
       });
     }
@@ -40,11 +47,13 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
 
   const togglePublic = async () => {
     try {
-      const result = await updateNote(syncId, note, !isPublic);
-      
+      setIsUpdating(true);
+
+      const result = await updateNote(note.id, { ...note, is_public: !note.is_public });
+
       if (result.success) {
-        toast.success(isPublic ? "Note made private" : "Note made public", {
-          description: isPublic 
+        toast.success(note.is_public ? "Note made private" : "Note made public", {
+          description: note.is_public
             ? "Your note is no longer publicly accessible."
             : "Your note can now be accessed via a public link.",
         });
@@ -52,16 +61,18 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
         throw new Error("Failed to update note");
       }
     } catch (error) {
-        toast.error("Update failed", {
+      toast.error("Update failed", {
         description: "Could not update sharing settings.",
       });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   const copyShareLink = async () => {
     const shareUrl = `${window.location.origin}/share/${note.id}`;
     await navigator.clipboard.writeText(shareUrl);
-     toast.success("Link copied", {
+    toast.success("Link copied", {
       description: "Share link has been copied to clipboard.",
     });
   };
@@ -72,49 +83,74 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
         <div className="flex items-center justify-between mb-4">
           <Link href="/">
             <Button variant="ghost">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="size-4 mr-2" />
               Back to Notes
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={togglePublic}
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              {isPublic ? 'Make Private' : 'Make Public'}
-            </Button>
-            {isPublic && (
-              <Button
-                variant="outline"
-                onClick={copyShareLink}
-              >
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Link
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save
-                </>
-              ) : (
-                <>
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Edit
-                </>
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size={'icon'}
+                    onClick={togglePublic}
+                    disabled={isUpdating}
+                  >
+                    {note.is_public ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{note.is_public ? "Make private" : "Make public"}</p>
+                </TooltipContent>
+              </Tooltip>
+              {note.is_public && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size={'icon'}
+                      onClick={copyShareLink}
+                      disabled={isUpdating}
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy share link</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
-            </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size={'icon'}
+                    onClick={() => setIsEditing(!isEditing)}
+                    disabled={isUpdating}
+                  >
+                    {isEditing ? (
+                      <>
+                        <Save className="size-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Edit2 className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isEditing ? "Save changes" : "Edit note"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
-        
+
         <div
           className="rounded-lg"
-          style={{ 
+          style={{
             backgroundColor: note.color,
             filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
           }}
@@ -128,7 +164,7 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
             />
           ) : (
             <div className="p-4">
-              <div 
+              <div
                 className="text-zinc-800 dark:text-zinc-900 prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{ __html: note.content }}
               />
@@ -136,6 +172,6 @@ export function NoteDetailView({ note, syncId, isPublic }: NoteDetailViewProps) 
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }

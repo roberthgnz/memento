@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NoteEditor } from "@/components/note-editor";
 import { NoteCard } from "@/components/note-card";
-import { generateId, getRandomColor } from "@/lib/utils";
+import { getRandomColor } from "@/lib/utils";
 import type { Note } from "@/types";
 import { createNote, updateNote, deleteNote } from "@/app/actions";
 import { toast } from "sonner";
@@ -20,19 +20,19 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   const [pendingAction, setPendingAction] = useState<'pin' | 'delete' | 'update' | null>(null);
 
   const handleCreateNote = async (content: string) => {
-    const newNote: Note = {
-      id: generateId(),
+    const newNote = {
       content,
+      sync_id: syncId,
+      is_pinned: false,
+      is_public: false,
       color: getRandomColor(),
-      date: new Date(),
-      isPinned: false,
     };
 
     startTransition(async () => {
       try {
-        const result = await createNote(syncId, newNote);
+        const result = await createNote(newNote);
         if (result.success) {
-          setNotes(prev => [newNote, ...prev]);
+          setNotes(prev => [...(result?.data ? result?.data : []), ...prev]);
           toast.success("Note created", {
             description: "Your note has been added.",
           });
@@ -123,8 +123,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
     });
   };
 
-  const pinnedNotes = notes.filter(note => note.isPinned);
-  const unpinnedNotes = notes.filter(note => !note.isPinned);
+  const pinnedNotes = notes.filter(note => note.is_pinned);
+  const unpinnedNotes = notes.filter(note => !note.is_pinned);
 
   return (
     <Tabs defaultValue="all" className="space-y-4">

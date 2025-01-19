@@ -10,16 +10,16 @@ async function getNote(syncId: string, id: string) {
   try {
     const { data, error } = await supabase
       .from('notes')
-      .select('note_data, is_public')
+      .select('*')
       .eq('sync_id', syncId)
-      .eq('note_data->>id', id)
+      .eq('id', id)
       .single();
     
     if (error) throw error;
-    return {
-      note: data?.note_data as Note,
-      isPublic: data?.is_public || false
-    };
+    
+    if (!data) return null;
+
+    return data as Note;
   } catch (error) {
     return null;
   }
@@ -27,11 +27,11 @@ async function getNote(syncId: string, id: string) {
 
 export default async function NotePage({ params }: { params: { id: string } }) {
   const syncId = getSyncId();
-  const noteData = await getNote(syncId, params.id);
+  const note = await getNote(syncId, params.id);
 
-  if (!noteData) {
+  if (!note) {
     notFound();
   }
 
-  return <NoteDetailView note={noteData.note} syncId={syncId} isPublic={noteData.isPublic} />;
+  return <NoteDetailView note={note} />;
 }

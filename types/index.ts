@@ -1,7 +1,9 @@
 export type Note = {
   id: string;
+  sync_id: string;
   content: string;
   color: string;
-  date: Date;
-  isPinned: boolean;
+  created_at: Date;
+  is_pinned: boolean;
+  is_public: boolean;
 };

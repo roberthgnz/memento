@@ -45,7 +45,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAc
           />
           <div className="flex items-center justify-between">
             <span className="text-sm text-zinc-600 dark:text-zinc-700">
-              {format(new Date(note.date), 'MMM d, yyyy')}
+              {format(new Date(note.created_at), 'MMM d, yyyy')}
             </span>
             <div className="flex items-center space-x-2">
               <Link href={`/note/${note.id}`}>
@@ -67,7 +67,7 @@ export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAc
                 {isPending && pendingAction === 'pin' ? (
                   <LoaderIcon className="size-4 animate-spin" />
                 ) : (
-                  <Pin className={`size-4 ${note.isPinned ? 'fill-current' : ''}`} />
+                  <Pin className={`size-4 ${note.is_pinned ? 'fill-current' : ''}`} />
                 )}
               </Button>
               <Button
