@@ -42,9 +42,8 @@ export function NoteCard({ type, note, onPin, onDelete, isPending, pendingAction
       ) : (
         <>
           <div
-            className="text-zinc-800 dark:text-zinc-900 mb-3 cursor-pointer prose prose-sm max-w-none"
+            className="text-zinc-800 dark:text-zinc-900 mb-3 cursor-pointer prose prose-sm max-w-none [&>pre]:truncate [&>pre]:max-h-[80px] [&>pre>code]:truncate"
             dangerouslySetInnerHTML={{ __html: note.content }}
-            style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
             onClick={() => setIsEditing(true)}
           />
           <div className="flex items-center justify-between">
