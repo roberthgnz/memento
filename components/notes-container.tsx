@@ -1,4 +1,4 @@
-import { getNotesBySyncId } from "@/app/actions";
+import { getNotesByUserId } from "@/app/actions";
 import { NotesList } from "./notes-list";
 
 import { format, isToday, isYesterday, isThisWeek, isThisMonth } from "date-fns";
@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NotesContainerProps {
   type: 'all' | 'notes' | 'pinned';
-  syncId: string;
+  userId?: string;
 }
 
 function groupNotesByDate(notes: Note[]): GroupedNotes[] {
@@ -38,8 +38,10 @@ function groupNotesByDate(notes: Note[]): GroupedNotes[] {
   }, []);
 }
 
-export async function NotesContainer({ type, syncId }: NotesContainerProps) {
-  const notes = await getNotesBySyncId(syncId, type);
+export async function NotesContainer({ type, userId }: NotesContainerProps) {
+  if (!userId) return null;
+
+  const notes = await getNotesByUserId(userId, type);
 
   const grouped = groupNotesByDate(notes).sort((a, b) => {
     if (a.label === 'TODAY') return -1;
@@ -56,5 +58,4 @@ export async function NotesContainer({ type, syncId }: NotesContainerProps) {
   return <ScrollArea className="h-[60vh] [&>div]:px-2">
     <NotesList groups={grouped} type={type} />
   </ScrollArea>
-
 }

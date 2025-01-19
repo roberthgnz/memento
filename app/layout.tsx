@@ -4,7 +4,6 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 import { Navbar } from "@/components/navbar";
-import { getSyncId } from "@/lib/cookies";
 
 export const metadata: Metadata = {
   title: 'Memento',
@@ -16,8 +15,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const syncId = getSyncId();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
@@ -28,7 +25,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative h-[calc(100vh_-_56px)] flex flex-col">
-            <Navbar syncId={syncId} />
+            <Navbar />
             <main className="flex-1">
               {children}
             </main>

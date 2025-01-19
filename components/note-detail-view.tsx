@@ -17,11 +17,10 @@ import {
 } from "@/components/ui/tooltip"
 
 interface NoteDetailViewProps {
-  syncId: string;
   note: Note;
 }
 
-export function NoteDetailView({ syncId, note }: NoteDetailViewProps) {
+export function NoteDetailView({ note }: NoteDetailViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -133,7 +132,6 @@ export function NoteDetailView({ syncId, note }: NoteDetailViewProps) {
       >
         {isEditing ? (
           <NoteEditor
-            syncId={syncId}
             noteId={note.id}
             type={note.is_pinned ? "pinned" : "notes"}
             initialContent={note.content}

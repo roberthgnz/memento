@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import { redirect } from 'next/navigation';
 
 interface NoteEditorProps {
-  syncId: string;
   type: 'all' | 'notes' | 'pinned';
   initialContent?: string;
   noteId?: string;
@@ -24,7 +23,6 @@ interface NoteEditorProps {
 }
 
 export function NoteEditor({
-  syncId,
   type,
   initialContent = "",
   noteId,
@@ -71,7 +69,6 @@ export function NoteEditor({
   const handleCreate = async (content: string) => {
     const newNote = {
       content,
-      sync_id: syncId,
       is_public: false,
       is_pinned: type === 'pinned',
       color: getRandomColor(),

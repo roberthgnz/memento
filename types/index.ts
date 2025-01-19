@@ -1,6 +1,6 @@
 export type Note = {
   id: string;
-  sync_id: string;
+  user_id: string;
   content: string;
   color: string;
   created_at: Date;

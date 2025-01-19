@@ -1,16 +1,19 @@
 import { notFound } from 'next/navigation';
-import { getSyncId } from '@/lib/cookies';
 import { NoteDetailView } from '@/components/note-detail-view';
 import type { Note } from '@/types';
 import { createClient } from '@/lib/supabase/server';
 
-async function getNote(syncId: string, id: string) {
+async function getNote(id: string) {
   try {
     const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user!.id
+
     const { data, error } = await supabase
       .from('notes')
       .select('*')
-      .eq('sync_id', syncId)
+      .eq('user_id', userId)
       .eq('id', id)
       .single();
 
@@ -25,12 +28,11 @@ async function getNote(syncId: string, id: string) {
 }
 
 export default async function NotePage({ params }: { params: { id: string } }) {
-  const syncId = getSyncId();
-  const note = await getNote(syncId, params.id);
+  const note = await getNote(params.id);
 
   if (!note) {
     notFound();
   }
 
-  return <NoteDetailView syncId={syncId} note={note} />;
+  return <NoteDetailView note={note} />;
 }

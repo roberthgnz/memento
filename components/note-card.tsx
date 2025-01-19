@@ -31,7 +31,6 @@ export function NoteCard({ type, note, onPin, onDelete, isPending, pendingAction
       {isEditing ? (
         <NoteEditor
           type={type}
-          syncId={note.sync_id}
           noteId={note.id}
           initialContent={note.content}
           onCancel={() => setIsEditing(false)}

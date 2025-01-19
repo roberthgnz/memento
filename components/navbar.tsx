@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { StickyNote } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SyncDialog } from "./sync-dialog";
-import { updateSyncId } from "@/app/actions";
 import { AuthButton } from "./auth-button";
 import { createClient } from "@/lib/supabase/server";
 
-export async function Navbar({ syncId }: { syncId: string }) {
+export async function Navbar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -23,7 +21,6 @@ export async function Navbar({ syncId }: { syncId: string }) {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-2">
-            <SyncDialog syncId={syncId} onSync={updateSyncId} />
             <AuthButton user={user} />
             <ThemeToggle />
           </nav>
