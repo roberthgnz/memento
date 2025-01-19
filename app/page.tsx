@@ -4,6 +4,7 @@ import { NotesTabs } from "@/components/notes-tabs";
 import { NoteEditor } from "@/components/note-editor";
 import { NotesListSkeleton } from "@/components/notes-list skeleton";
 import { createClient } from "@/lib/supabase/server";
+import { HeroSection } from "@/components/hero-section";
 
 type SearchPageParams = {
   type?: 'all' | 'notes' | 'pinned';
@@ -15,6 +16,8 @@ export default async function Home({ searchParams }: { searchParams: SearchPageP
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const userId = user?.id
+
+  if (!userId) return <HeroSection />
 
   return (
     <div className="max-w-4xl mx-auto p-4">
