@@ -17,6 +17,7 @@ interface NotesContainerProps {
 export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   const [notes, setNotes] = useState(initialNotes);
   const [isPending, startTransition] = useTransition();
+  const [pendingAction, setPendingAction] = useState<'pin' | 'delete' | 'update' | null>(null);
 
   const handleCreateNote = async (content: string) => {
     const newNote: Note = {
@@ -52,6 +53,7 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
 
     const updatedNote = { ...noteToUpdate, content, date: new Date() };
 
+    setPendingAction('update');
     startTransition(async () => {
       try {
         const result = await updateNote(syncId, updatedNote);
@@ -66,6 +68,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
         toast.error("Update failed", {
           description: "Could not update the note.",
         });
+      } finally {
+        setPendingAction(null);
       }
     });
   };
@@ -76,6 +80,7 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
 
     const updatedNote = { ...noteToUpdate, isPinned: !noteToUpdate.isPinned };
 
+    setPendingAction('pin');
     startTransition(async () => {
       try {
         const result = await updateNote(syncId, updatedNote);
@@ -90,6 +95,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
         toast.error("Action failed", {
           description: "Could not pin/unpin the note.",
         });
+      } finally {
+        setPendingAction(null);
       }
     });
   };
@@ -97,6 +104,7 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
   const handleDeleteNote = async (id: string) => {
     const updatedNotes = notes.filter(note => note.id !== id);
 
+    setPendingAction('delete');
     startTransition(async () => {
       try {
         const result = await deleteNote(id);
@@ -109,6 +117,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
         toast.error("Delete failed", {
           description: "Could not delete the note.",
         });
+      } finally {
+        setPendingAction(null);
       }
     });
   };
@@ -153,6 +163,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
               onPin={handleTogglePin}
               onDelete={handleDeleteNote}
               onUpdate={handleUpdateNote}
+              isPending={isPending}
+              pendingAction={pendingAction}
             />
           ))}
         </TabsContent>
@@ -164,6 +176,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
               onPin={handleTogglePin}
               onDelete={handleDeleteNote}
               onUpdate={handleUpdateNote}
+              isPending={isPending}
+              pendingAction={pendingAction}
             />
           ))}
         </TabsContent>
@@ -175,6 +189,8 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
               onPin={handleTogglePin}
               onDelete={handleDeleteNote}
               onUpdate={handleUpdateNote}
+              isPending={isPending}
+              pendingAction={pendingAction}
             />
           ))}
         </TabsContent>

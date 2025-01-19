@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Pin, Trash2, ExternalLink, LoaderIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { NoteEditor } from "@/components/note-editor";
 import type { Note } from "@/types";
-import { toast } from "sonner";
 import Link from "next/link";
 
 interface NoteCardProps {
@@ -14,59 +13,18 @@ interface NoteCardProps {
   onPin: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onUpdate: (id: string, content: string) => Promise<void>;
+  isPending: boolean;
+  pendingAction: 'pin' | 'delete' | 'update' | null;
 }
 
-export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
+export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAction }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isPending, startTransition] = useTransition();
 
-  const handleUpdate = async (content: string) => {
-    startTransition(async () => {
-      try {
-        await onUpdate(note.id, content);
-        setIsEditing(false);
-         toast.success("Note updated", {
-          description: "Your changes have been saved.",
-        });
-      } catch (error) {
-         toast.error("Update failed", {
-          description: "Could not save your changes.",
-        });
-      }
-    });
-  };
-
-  const handlePin = () => {
-    startTransition(async () => {
-      try {
-        await onPin(note.id);
-      } catch (error) {
-       toast.error("Action failed", {
-          description: "Could not pin/unpin the note.",
-        });
-      }
-    });
-  };
-
-  const handleDelete = () => {
-    startTransition(async () => {
-      try {
-        await onDelete(note.id);
-        toast.success("Note deleted", {
-          description: "Your note has been removed.",
-        });
-      } catch (error) {
-         toast.error("Delete failed", {
-          description: "Could not delete the note.",
-        });
-      }
-    });
-  };
 
   return (
     <div
       className="rounded-lg p-4 relative group transition-colors"
-      style={{ 
+      style={{
         backgroundColor: note.color,
         filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
       }}
@@ -74,13 +32,13 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
       {isEditing ? (
         <NoteEditor
           initialContent={note.content}
-          onSubmit={handleUpdate}
+          onSubmit={(content) => onUpdate(note.id, content)}
           onCancel={() => setIsEditing(false)}
           showCancelButton
         />
       ) : (
         <>
-          <div 
+          <div
             className="text-zinc-800 dark:text-zinc-900 mb-3 cursor-pointer prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: note.content }}
             style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}
@@ -104,19 +62,27 @@ export function NoteCard({ note, onPin, onDelete, onUpdate }: NoteCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={handlePin}
+                onClick={() => onPin(note.id)}
                 disabled={isPending}
               >
-                {isPending ? <LoaderIcon className="size-4 animate-spin" /> : <Pin className={`size-4 ${note.isPinned ? 'fill-current' : ''}`} />}
+                {isPending && pendingAction === 'pin' ? (
+                  <LoaderIcon className="size-4 animate-spin" />
+                ) : (
+                  <Pin className={`size-4 ${note.isPinned ? 'fill-current' : ''}`} />
+                )}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600 dark:text-red-700 dark:hover:text-red-800"
-                onClick={handleDelete}
+                onClick={() => onDelete(note.id)}
                 disabled={isPending}
               >
-                {isPending ? <LoaderIcon className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+                {isPending && pendingAction === 'delete' ? (
+                  <LoaderIcon className="size-4 animate-spin" />
+                ) : (
+                  <Trash2 className="size-4" />
+                )}
               </Button>
             </div>
           </div>
