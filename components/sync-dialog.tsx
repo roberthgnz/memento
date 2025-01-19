@@ -9,12 +9,13 @@ import { Smartphone, Copy } from 'lucide-react';
 
 interface SyncDialogProps {
   syncId: string;
-  onSync: (code: string) => void;
+  onSync: (code: string) => Promise<void>;
 }
 
 export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
   const [qrCode, setQrCode] = useState('');
   const [syncCode, setSyncCode] = useState('');
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     QRCode.toDataURL(syncId).then(setQrCode);
@@ -24,16 +25,17 @@ export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
     navigator.clipboard.writeText(syncId);
   };
 
-  const handleSync = (e: React.FormEvent) => {
+  const handleSync = async (e: React.FormEvent) => {
     e.preventDefault();
     if (syncCode.trim()) {
-      onSync(syncCode.trim());
+      await onSync(syncCode.trim());
       setSyncCode('');
+      setOpen(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="fixed bottom-4 right-4">
           <Smartphone className="w-4 h-4 mr-2" />
