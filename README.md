@@ -103,15 +103,15 @@ We love contributions! Here's how you can help:
 
 ```
 memento/
-├── app/                   # Next.js app router pages
-├── components/           # React components
-│   ├── ui/              # shadcn/ui components
-│   └── ...              # Feature components
-├── lib/                 # Utility functions and shared logic
-├── public/              # Static assets
-├── styles/             # Global styles
-├── types/              # TypeScript type definitions
-└── supabase/           # Supabase configurations and migrations
+├── app/             # Next.js app router pages
+├── components/      # React components
+│   ├── ui/          # shadcn/ui components
+│   └── ...          # Feature components
+├── lib/             # Utility functions and shared logic
+├── public/          # Static assets
+├── styles/          # Global styles
+├── types/           # TypeScript type definitions
+└── supabase/        # Supabase configurations and migrations
 ```
 
 ## 🧪 Testing
