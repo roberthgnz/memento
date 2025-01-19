@@ -3,46 +3,47 @@
 import { Button } from "@/components/ui/button";
 import { signInWithProvider } from "@/lib/auth";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const sampleNotes = [
     {
         content: `<div class="space-y-2">
-      <h3 class="font-semibold">📅 Project Kickoff Notes</h3>
-      <ul class="list-disc pl-4 space-y-1">
+      <h3 class="font-semibold text-zinc-900 dark:text-zinc-50">📅 Project Kickoff Notes</h3>
+      <ul class="list-disc pl-4 space-y-1 text-zinc-800 dark:text-zinc-200">
         <li><strong>Team:</strong> Design & Development</li>
         <li><strong>Goals:</strong> Launch MVP by Q2</li>
         <li><strong>Next Steps:</strong> Set up weekly sprints</li>
       </ul>
-      <p class="text-sm text-muted-foreground">Added 2 hours ago</p>
+      <p class="text-sm text-zinc-600 dark:text-zinc-400">Added 2 hours ago</p>
     </div>`,
-        color: "#fef3c7",
+        color: "rgb(254 243 199 / 0.8) dark:rgb(234 179 8 / 0.2)",
         rotate: -2,
     },
     {
         content: `<div class="space-y-2">
-      <h3 class="font-semibold">🛒 Shopping List</h3>
-      <div class="space-y-1">
+      <h3 class="font-semibold text-zinc-900 dark:text-zinc-50">🛒 Shopping List</h3>
+      <div class="space-y-1 text-zinc-800 dark:text-zinc-200">
         <p>🥑 Avocados</p>
         <p>🥖 Sourdough bread</p>
         <p>🫐 Fresh berries</p>
         <p>🥛 Oat milk</p>
       </div>
-      <p class="text-sm text-muted-foreground">Updated 5 min ago</p>
+      <p class="text-sm text-zinc-600 dark:text-zinc-400">Updated 5 min ago</p>
     </div>`,
-        color: "#dbeafe",
+        color: "rgb(219 234 254 / 0.8) dark:rgb(59 130 246 / 0.2)",
         rotate: 1,
     },
     {
         content: `<div class="space-y-2">
-      <h3 class="font-semibold">💡 Feature Ideas</h3>
-      <div class="space-y-1">
+      <h3 class="font-semibold text-zinc-900 dark:text-zinc-50">💡 Feature Ideas</h3>
+      <div class="space-y-1 text-zinc-800 dark:text-zinc-200">
         <p><strong>AI Integration:</strong> Smart note categorization</p>
         <p><strong>Collaboration:</strong> Real-time editing</p>
         <p><strong>Mobile:</strong> Offline support</p>
       </div>
-      <p class="text-sm text-muted-foreground">Pinned note</p>
+      <p class="text-sm text-zinc-600 dark:text-zinc-400">Pinned note</p>
     </div>`,
-        color: "#f5d0fe",
+        color: "rgb(245 208 254 / 0.8) dark:rgb(168 85 247 / 0.2)",
         rotate: -1,
     },
 ];
@@ -70,6 +71,86 @@ const features = [
     },
 ];
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.3,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            type: "spring",
+            stiffness: 100,
+            damping: 10,
+        },
+    },
+};
+
+const titleVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            type: "spring",
+            stiffness: 200,
+            damping: 20,
+        },
+    },
+};
+
+const backgroundVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+        opacity: 0.1,
+        scale: 1,
+        transition: {
+            type: "spring",
+            stiffness: 100,
+            damping: 20,
+            delay: 0.2,
+        },
+    },
+};
+
+const noteVariants = {
+    hidden: (i: number) => ({
+        opacity: 0,
+        y: 50,
+        rotate: 0,
+    }),
+    visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        rotate: window.innerWidth >= 640 ? [-2, 1, -1][i] : 0,
+        transition: {
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            delay: 0.2 + i * 0.1,
+        },
+    }),
+    hover: (i: number) => ({
+        scale: 1.05,
+        rotate: window.innerWidth >= 640 ? [-3, 2, -2][i] : 0,
+        y: -5,
+        transition: {
+            type: "spring",
+            stiffness: 300,
+            damping: 15,
+        },
+    }),
+};
+
 export function HeroSection() {
     const handleSignIn = async (provider: "github" | "google") => {
         try {
@@ -84,19 +165,45 @@ export function HeroSection() {
     return (
         <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
             <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+                <motion.div
+                    className="absolute inset-0 bg-grid-pattern"
+                    initial="hidden"
+                    animate="visible"
+                    variants={backgroundVariants}
+                />
                 <div className="relative w-full max-w-5xl mx-auto px-4 py-8 sm:py-16 sm:px-6 lg:px-8 text-center">
-                    <div className="space-y-6">
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 to-yellow-500 dark:from-yellow-500 dark:to-yellow-400"
-                        >Memento</h1>
-                        <h2 className="text-2xl font-bold tracking-tight sm:text-4xl">
+                    <motion.div
+                        className="space-y-6"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <div className="relative">
+                            <motion.h1
+                                variants={titleVariants}
+                                className="text-4xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 to-yellow-500 dark:from-yellow-500 dark:to-yellow-400"
+                            >
+                                Memento
+                            </motion.h1>
+                        </div>
+                        <motion.h2
+                            variants={itemVariants}
+                            className="text-3xl sm:text-4xl font-semibold"
+                        >
                             Your thoughts, organized{" "}
                             <span className="text-yellow-600 dark:text-yellow-500">beautifully</span>
-                        </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Create, organize, and share your notes with ease. <br />
-                            Sign in to start your journey.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        </motion.h2>
+                        <motion.p
+                            variants={itemVariants}
+                            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+                        >
+                            Create, organize, and share your notes with ease. Sign in to start your journey
+                            or continue as a guest to try it out.
+                        </motion.p>
+                        <motion.div
+                            variants={itemVariants}
+                            className="flex flex-col sm:flex-row gap-4 justify-center"
+                        >
                             <Button
                                 size="lg"
                                 variant="outline"
@@ -129,48 +236,73 @@ export function HeroSection() {
                                 </svg>
                                 Sign in with GitHub
                             </Button>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
                     {/* Sample Notes */}
-                    <div className="relative mt-16 sm:mt-24">
+                    <motion.div
+                        className="relative mt-16 sm:mt-24"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-4 sm:gap-8">
-                            {sampleNotes.map((note, index) => (
-                                <div
-                                    key={index}
-                                    className="w-[85vw] sm:w-72 transform transition-transform duration-200 hover:scale-105 cursor-pointer"
-                                    style={{
-                                        backgroundColor: note.color,
-                                        rotate: `${window.innerWidth >= 640 ? note.rotate : 0}deg`,
-                                    }}
-                                >
-                                    <div className="rounded-lg p-4 shadow-lg backdrop-blur-sm bg-opacity-90">
-                                        <div
-                                            className="prose prose-sm max-w-none dark:prose-invert"
-                                            dangerouslySetInnerHTML={{ __html: note.content }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
+                            <AnimatePresence>
+                                {sampleNotes.map((note, index) => (
+                                    <motion.div
+                                        key={index}
+                                        custom={index}
+                                        variants={noteVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        whileHover="hover"
+                                        className="w-[85vw] sm:w-72 cursor-pointer"
+                                        style={{
+                                            backgroundColor: note.color,
+                                        }}
+                                    >
+                                        <div className="rounded-lg p-4 shadow-lg backdrop-blur-sm">
+                                            <div
+                                                dangerouslySetInnerHTML={{ __html: note.content }}
+                                            />
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Features Section */}
-                    <div className="mt-24 sm:mt-32">
-                        <h2 className="text-3xl font-bold mb-12">Features you&lsquo;ll love</h2>
+                    <motion.div
+                        className="mt-24 sm:mt-32"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <motion.h2
+                            variants={itemVariants}
+                            className="text-3xl font-bold mb-12"
+                        >
+                            Features you'll love
+                        </motion.h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {features.map((feature, index) => (
-                                <div
+                                <motion.div
                                     key={index}
+                                    variants={itemVariants}
+                                    whileHover={{
+                                        scale: 1.05,
+                                        transition: { type: "spring", stiffness: 300, damping: 15 }
+                                    }}
                                     className="p-6 rounded-lg bg-card border transition-colors hover:bg-accent"
                                 >
                                     <div className="text-3xl mb-4">{feature.icon}</div>
                                     <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
                                     <p className="text-sm text-muted-foreground">{feature.description}</p>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </div>
