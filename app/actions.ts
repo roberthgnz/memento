@@ -55,8 +55,6 @@ export async function deleteNote(noteId: string) {
 
 export async function getNotesBySyncId(syncId: string, type: 'all' | 'notes' | 'pinned') {
   try {
-    console.log('Fetching notes:', syncId, type);
-
     let query = supabase
       .from('notes')
       .select('*')
