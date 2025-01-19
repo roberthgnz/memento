@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit2, Save } from 'lucide-react';
+import { ArrowLeft, Edit2, Save, Share2, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { NoteEditor } from '@/components/note-editor';
 import { updateNote } from '@/app/actions';
@@ -41,6 +41,39 @@ export function NoteDetailView({ note, syncId }: NoteDetailViewProps) {
     }
   };
 
+  const togglePublic = async () => {
+    try {
+      const updatedNote = { ...note, isPublic: !note.isPublic };
+      const result = await updateNote(syncId, updatedNote);
+      
+      if (result.success) {
+        toast({
+          title: note.isPublic ? "Note made private" : "Note made public",
+          description: note.isPublic 
+            ? "Your note is no longer publicly accessible."
+            : "Your note can now be accessed via a public link.",
+        });
+      } else {
+        throw new Error("Failed to update note");
+      }
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Could not update sharing settings.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyShareLink = () => {
+    const shareUrl = `${window.location.origin}/share/${note.id}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast({
+      title: "Link copied",
+      description: "Share link has been copied to clipboard.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto">
@@ -51,22 +84,40 @@ export function NoteDetailView({ note, syncId }: NoteDetailViewProps) {
               Back to Notes
             </Button>
           </Link>
-          <Button
-            variant="ghost"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </>
-            ) : (
-              <>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Edit
-              </>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={togglePublic}
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              {note.isPublic ? 'Make Private' : 'Make Public'}
+            </Button>
+            {note.isPublic && (
+              <Button
+                variant="outline"
+                onClick={copyShareLink}
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copy Link
+              </Button>
             )}
-          </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </>
+              ) : (
+                <>
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit
+                </>
+              )}
+            </Button>
+          </div>
         </div>
         
         <div
