@@ -12,9 +12,9 @@ async function getNote(syncId: string, id: string) {
       .eq('sync_id', syncId)
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
-    
+
     if (!data) return null;
 
     return data as Note;
@@ -31,5 +31,5 @@ export default async function NotePage({ params }: { params: { id: string } }) {
     notFound();
   }
 
-  return <NoteDetailView note={note} />;
+  return <NoteDetailView syncId={syncId} note={note} />;
 }

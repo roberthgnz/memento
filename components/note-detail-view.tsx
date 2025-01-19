@@ -16,50 +16,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-
 interface NoteDetailViewProps {
+  syncId: string;
   note: Note;
 }
 
-export function NoteDetailView({ note }: NoteDetailViewProps) {
+export function NoteDetailView({ syncId, note }: NoteDetailViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
-  const handleUpdate = async (content: string) => {
-    try {
-      const updatedNote = { ...note, content, date: new Date() };
-      const result = await updateNote(note.id, updatedNote);
-
-      if (result.success) {
-        setIsEditing(false);
-        toast.success("Note updated", {
-          description: "Your changes have been saved.",
-        });
-      } else {
-        throw new Error("Failed to update note");
-      }
-    } catch (error) {
-      toast.error("Update failed", {
-        description: "Could not save your changes.",
-      });
-    }
-  };
 
   const togglePublic = async () => {
     try {
       setIsUpdating(true);
-
-      const result = await updateNote(note.id, { ...note, is_public: !note.is_public });
-
-      if (result.success) {
-        toast.success(note.is_public ? "Note made private" : "Note made public", {
-          description: note.is_public
-            ? "Your note is no longer publicly accessible."
-            : "Your note can now be accessed via a public link.",
-        });
-      } else {
-        throw new Error("Failed to update note");
+      const result = await updateNote(note.id, { is_public: !note.is_public });
+      if (!result.success) {
+        throw result.error;
       }
+      toast.success(note.is_public ? "Note made private" : "Note made public", {
+        description: note.is_public
+          ? "Your note is no longer publicly accessible."
+          : "Your note can now be accessed via a public link.",
+      });
     } catch (error) {
       toast.error("Update failed", {
         description: "Could not update sharing settings.",
@@ -157,8 +134,11 @@ export function NoteDetailView({ note }: NoteDetailViewProps) {
         >
           {isEditing ? (
             <NoteEditor
+              syncId={syncId}
+              noteId={note.id}
+              type={note.is_pinned ? "pinned" : "notes"}
               initialContent={note.content}
-              onSubmit={handleUpdate}
+              isEditing={isEditing}
               onCancel={() => setIsEditing(false)}
               showCancelButton
             />

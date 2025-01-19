@@ -39,7 +39,7 @@ function groupNotesByDate(notes: Note[]): GroupedNotes[] {
 
 export async function NotesContainer({ type, syncId }: NotesContainerProps) {
   const notes = await getNotesBySyncId(syncId, type);
-  
+
   const grouped = groupNotesByDate(notes).sort((a, b) => {
     if (a.label === 'TODAY') return -1;
     if (b.label === 'TODAY') return 1;
@@ -52,5 +52,5 @@ export async function NotesContainer({ type, syncId }: NotesContainerProps) {
     return 0;
   });
 
-  return <NotesList groups={grouped} type={type} syncId={syncId} />;
+  return <NotesList groups={grouped} type={type} />;
 }

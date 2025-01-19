@@ -6,20 +6,37 @@ import Underline from '@tiptap/extension-underline';
 import BulletList from '@tiptap/extension-bullet-list';
 import { Bold, Italic, Underline as UnderlineIcon, List, Strikethrough, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState, useTransition } from 'react';
+import { getRandomColor } from '@/lib/utils';
+import { createNote, updateNote } from '@/app/actions';
+import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
 
 interface NoteEditorProps {
-  onSubmit: (content: string) => void;
+  syncId: string;
+  type: 'all' | 'notes' | 'pinned';
   initialContent?: string;
+  noteId?: string;
+  isEditing?: boolean;
   onCancel?: () => void;
+  onSave?: () => void;
   showCancelButton?: boolean;
 }
 
-export function NoteEditor({ 
-  onSubmit, 
-  initialContent = "", 
-  onCancel, 
-  showCancelButton = false 
+export function NoteEditor({
+  syncId,
+  type,
+  initialContent = "",
+  noteId,
+  isEditing = false,
+  onCancel,
+  onSave,
+  showCancelButton = false
 }: NoteEditorProps) {
+  const [isPending, startTransition] = useTransition();
+
+  const [_, setContent] = useState(initialContent);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -38,14 +55,73 @@ export function NoteEditor({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editor?.getHTML()) {
-      onSubmit(editor.getHTML());
-      editor.commands.clearContent();
+      const content = editor.getHTML() as string;
+      setContent(content);
+      if (isEditing) {
+        handleUpdate(content);
+      } else {
+        handleCreate(content);
+        editor.commands.clearContent();
+      }
+      onSave?.();
     }
   };
 
+  const handleCreate = async (content: string) => {
+    const newNote = {
+      content,
+      sync_id: syncId,
+      is_public: false,
+      is_pinned: type === 'pinned',
+      color: getRandomColor(),
+    };
+    startTransition(async () => {
+      try {
+        const result = await createNote(newNote);
+        if (!result.success) {
+          throw result.error;
+        }
+        toast.success("Note created", {
+          description: "Your note has been added.",
+        });
+      } catch (error) {
+        toast.error("Creation failed", {
+          description: "Could not create the note.",
+        });
+      } finally {
+        if (!isEditing) {
+          redirect(`/?type=${type}`);
+        }
+      }
+    });
+  };
+
+  const handleUpdate = async (content: string) => {
+    startTransition(async () => {
+      try {
+
+        const result = await updateNote(noteId as string, { content });
+        if (!result.success) {
+          throw result.error;
+        }
+        toast.success("Note updated", {
+          description: "Your changes have been saved.",
+        });
+      } catch (error) {
+        toast.error("Update failed", {
+          description: "Could not save your changes.",
+        });
+      } finally {
+        if (!isEditing) {
+          redirect(`/?type=${type}`);
+        }
+      }
+    });
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="bg-yellow-100/90 dark:bg-yellow-900/20 p-4 rounded-lg shadow-sm">
+    <form onSubmit={handleSubmit} className="w-full min-[640px]">
+      <div className="bg-yellow-100/90 dark:bg-yellow-900/20 p-4 rounded-lg shadow-sm size-full">
         <div className="flex gap-1 mb-2 border-b pb-2">
           <Button
             type="button"
@@ -102,7 +178,7 @@ export function NoteEditor({
         <EditorContent editor={editor} />
         <div className="flex justify-end mt-2 space-x-2">
           {showCancelButton && onCancel && (
-            <Button 
+            <Button
               type="button"
               size="sm"
               variant="ghost"
@@ -112,10 +188,11 @@ export function NoteEditor({
               Cancel
             </Button>
           )}
-          <Button 
+          <Button
             type="submit"
             size="sm"
             className="bg-transparent hover:bg-yellow-200/50 dark:hover:bg-yellow-800/30 text-yellow-800 dark:text-yellow-200"
+            disabled={isPending}
           >
             {!showCancelButton && <Plus className="w-4 h-4 mr-2" />}
             {showCancelButton ? 'Save' : 'Add'}

@@ -10,14 +10,14 @@ import Link from "next/link";
 
 interface NoteCardProps {
   note: Note;
+  type: 'all' | 'notes' | 'pinned';
   onPin: (id: string, is_pinned: boolean) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onUpdate: (id: string, content: string) => Promise<void>;
   isPending: boolean;
   pendingAction: 'pin' | 'delete' | 'update' | null;
 }
 
-export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAction }: NoteCardProps) {
+export function NoteCard({ type, note, onPin, onDelete, isPending, pendingAction }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -30,9 +30,13 @@ export function NoteCard({ note, onPin, onDelete, onUpdate, isPending, pendingAc
     >
       {isEditing ? (
         <NoteEditor
+          type={type}
+          syncId={note.sync_id}
+          noteId={note.id}
           initialContent={note.content}
-          onSubmit={(content) => onUpdate(note.id, content)}
           onCancel={() => setIsEditing(false)}
+          onSave={() => setIsEditing(false)}
+          isEditing={isEditing}
           showCancelButton
         />
       ) : (
