@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import QRCode from 'qrcode';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Smartphone, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SyncDialogProps {
   syncId: string;
@@ -13,16 +13,14 @@ interface SyncDialogProps {
 }
 
 export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
-  const [qrCode, setQrCode] = useState('');
   const [syncCode, setSyncCode] = useState('');
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    QRCode.toDataURL(syncId).then(setQrCode);
-  }, [syncId]);
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(syncId);
+    toast.success("Code copied", {
+      description: "Sync code has been copied to clipboard.",
+    });
   };
 
   const handleSync = async (e: React.FormEvent) => {
@@ -31,6 +29,9 @@ export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
       await onSync(syncCode.trim());
       setSyncCode('');
       setOpen(false);
+      toast.success("Sync successful", {
+        description: "Your notes have been synced.",
+      });
     }
   };
 
@@ -49,26 +50,19 @@ export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              Scan this QR code or use the sync code on another device to sync your notes
+              Share this code with another device to sync your notes
             </div>
-            <div className="flex flex-col items-center space-y-4">
-              {qrCode && (
-                <img 
-                  src={qrCode} 
-                  alt="Sync QR Code"
-                  className="w-48 h-48 bg-white p-2 rounded-lg"
-                />
-              )}
-              <div className="flex items-center space-x-2">
-                <code className="bg-muted px-2 py-1 rounded text-sm">{syncId}</code>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={copyToClipboard}
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
+            <div className="flex items-center space-x-2">
+              <code className="bg-muted px-3 py-1.5 rounded-md text-sm flex-1 font-mono">
+                {syncId}
+              </code>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={copyToClipboard}
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
             </div>
           </div>
           <div className="space-y-4">
@@ -80,9 +74,9 @@ export function SyncDialog({ syncId, onSync }: SyncDialogProps) {
                 value={syncCode}
                 onChange={(e) => setSyncCode(e.target.value)}
                 placeholder="Enter sync code..."
-                className="flex-1"
+                className="flex-1 font-mono"
               />
-              <Button type="submit">Sync!</Button>
+              <Button type="submit">Sync</Button>
             </form>
           </div>
         </div>
