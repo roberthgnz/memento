@@ -8,12 +8,13 @@ import type { Note } from "@/types";
 
 export async function createNote(syncId: string, note: Note) {
   try {
-    await supabase
+    const { error } = await supabase
       .from('notes')
       .upsert([{
         sync_id: syncId,
         note_data: note
       }]);
+    if (error) throw error;
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -23,7 +24,7 @@ export async function createNote(syncId: string, note: Note) {
 
 export async function updateNote(syncId: string, notes: Note[]) {
   try {
-    await supabase
+    const { error } = await supabase
       .from('notes')
       .upsert(
         notes.map(note => ({
@@ -31,6 +32,7 @@ export async function updateNote(syncId: string, notes: Note[]) {
           note_data: note
         }))
       );
+    if (error) throw error;
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -40,7 +42,7 @@ export async function updateNote(syncId: string, notes: Note[]) {
 
 export async function deleteNote(syncId: string, notes: Note[]) {
   try {
-    await supabase
+    const { error } = await supabase
       .from('notes')
       .upsert(
         notes.map(note => ({
@@ -48,6 +50,7 @@ export async function deleteNote(syncId: string, notes: Note[]) {
           note_data: note
         }))
       );
+    if (error) throw error;
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -62,7 +65,7 @@ export async function getNotesBySyncId(syncId: string) {
       .select('note_data')
       .eq('sync_id', syncId)
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data?.map(row => row.note_data as Note) || [];
   } catch (error) {
@@ -72,7 +75,6 @@ export async function getNotesBySyncId(syncId: string) {
 
 export async function updateSyncId(newSyncId: string) {
   "use server";
-  
   setSyncId(newSyncId);
   redirect('/');
 }
