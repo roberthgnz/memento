@@ -107,7 +107,7 @@ export function NotesContainer({ initialNotes, syncId }: NotesContainerProps) {
 
     startTransition(async () => {
       try {
-        const result = await deleteNote(syncId, updatedNotes);
+        const result = await deleteNote(id);
         if (result.success) {
           setNotes(updatedNotes);
         } else {

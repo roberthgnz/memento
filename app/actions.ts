@@ -68,17 +68,13 @@ export async function updateNote(syncId: string, note: Note, isPublic?: boolean)
   }
 }
 
-export async function deleteNote(syncId: string, notes: Note[]) {
+export async function deleteNote(noteId: string) {
   try {
     const { error } = await supabase
       .from('notes')
-      .upsert(
-        notes.map(note => ({
-          sync_id: syncId,
-          note_data: note,
-          is_public: false
-        }))
-      );
+      .delete()
+      .eq('note_data->>id', noteId);
+
     if (error) throw error;
     revalidatePath('/');
     return { success: true };
