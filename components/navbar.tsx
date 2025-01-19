@@ -1,16 +1,14 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { StickyNote } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { cn } from "@/lib/utils";
 import { SyncDialog } from "./sync-dialog";
 import { updateSyncId } from "@/app/actions";
+import { AuthButton } from "./auth-button";
+import { createClient } from "@/lib/supabase/server";
 
-export function Navbar({ syncId }: { syncId: string }) {
-  const pathname = usePathname();
-  const isHome = pathname === "/";
+export async function Navbar({ syncId }: { syncId: string }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -22,21 +20,11 @@ export function Navbar({ syncId }: { syncId: string }) {
               Memento
             </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link
-              href="/"
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                isHome ? "text-foreground" : "text-foreground/60"
-              )}
-            >
-              Notes
-            </Link>
-          </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-2">
             <SyncDialog syncId={syncId} onSync={updateSyncId} />
+            <AuthButton user={user} />
             <ThemeToggle />
           </nav>
         </div>

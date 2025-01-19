@@ -1,20 +1,21 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { setSyncId } from "@/lib/cookies";
 import { redirect } from "next/navigation";
 import type { Note } from "@/types";
+import { createClient } from "@/lib/supabase/server";
 
 export async function createNote(note: Partial<Note>) {
   try {
+    const supabase = await createClient();
     const { error, data } = await supabase
       .from('notes')
       .insert([note]).select().order('created_at', { ascending: false });
 
     if (error) throw error;
     revalidatePath('/');
-    
+
     return { success: true, data };
   } catch (error) {
     return { success: false, error };
@@ -23,6 +24,7 @@ export async function createNote(note: Partial<Note>) {
 
 export async function updateNote(noteId: string, note: Partial<Note>) {
   try {
+    const supabase = await createClient();
     const { error } = await supabase
       .from('notes')
       .update(note)
@@ -39,6 +41,7 @@ export async function updateNote(noteId: string, note: Partial<Note>) {
 
 export async function deleteNote(noteId: string) {
   try {
+    const supabase = await createClient();
     const { error } = await supabase
       .from('notes')
       .delete()
@@ -55,15 +58,16 @@ export async function deleteNote(noteId: string) {
 
 export async function getNotesBySyncId(syncId: string, type: 'all' | 'notes' | 'pinned') {
   try {
+    const supabase = await createClient();
     let query = supabase
       .from('notes')
       .select('*')
-      .eq('sync_id', syncId); 
+      .eq('sync_id', syncId);
 
     if (type === 'notes') {
-      query = query.eq('is_pinned', false); 
+      query = query.eq('is_pinned', false);
     } else if (type === 'pinned') {
-      query = query.eq('is_pinned', true); 
+      query = query.eq('is_pinned', true);
     }
 
     const { error, data } = await query;

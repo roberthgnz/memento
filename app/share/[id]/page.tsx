@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
-import { supabase } from "@/lib/supabase";
 import type { Note } from '@/types';
+import { createClient } from '@/lib/supabase/server';
 
 async function getPublicNote(id: string) {
   try {
+    const supabase = await createClient();
     const { data, error } = await supabase
       .from('notes')
       .select('*')
