@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="p-4">
       <div className="max-w-2xl mx-auto">
         <Link href="/">
           <Button variant="ghost" className="mb-4">

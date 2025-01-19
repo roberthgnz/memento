@@ -27,7 +27,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative min-h-screen flex flex-col">
+          <div className="relative h-[calc(100vh_-_56px)] flex flex-col">
             <Navbar syncId={syncId} />
             <main className="flex-1">
               {children}

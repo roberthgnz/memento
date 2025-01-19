@@ -55,103 +55,101 @@ export function NoteDetailView({ syncId, note }: NoteDetailViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="flex items-center justify-between mb-4">
-          <Link href="/">
-            <Button variant="ghost">
-              <ArrowLeft className="size-4 mr-2" />
-              Back
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2">
-            <TooltipProvider delayDuration={100}>
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="flex items-center justify-between mb-4">
+        <Link href="/">
+          <Button variant="ghost">
+            <ArrowLeft className="size-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+        <div className="flex items-center gap-2">
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size={'icon'}
+                  onClick={togglePublic}
+                  disabled={isUpdating}
+                >
+                  {note.is_public ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{note.is_public ? "Make private" : "Make public"}</p>
+              </TooltipContent>
+            </Tooltip>
+            {note.is_public && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
                     size={'icon'}
-                    onClick={togglePublic}
+                    onClick={copyShareLink}
                     disabled={isUpdating}
                   >
-                    {note.is_public ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+                    <Copy className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{note.is_public ? "Make private" : "Make public"}</p>
+                  <p>Copy share link</p>
                 </TooltipContent>
               </Tooltip>
-              {note.is_public && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size={'icon'}
-                      onClick={copyShareLink}
-                      disabled={isUpdating}
-                    >
-                      <Copy className="size-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Copy share link</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size={'icon'}
-                    onClick={() => setIsEditing(!isEditing)}
-                    disabled={isUpdating}
-                  >
-                    {isEditing ? (
-                      <>
-                        <Save className="size-4" />
-                      </>
-                    ) : (
-                      <>
-                        <Edit2 className="size-4" />
-                      </>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isEditing ? "Save changes" : "Edit note"}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-
-        <div
-          className="rounded-lg"
-          style={{
-            backgroundColor: note.color,
-            filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
-          }}
-        >
-          {isEditing ? (
-            <NoteEditor
-              syncId={syncId}
-              noteId={note.id}
-              type={note.is_pinned ? "pinned" : "notes"}
-              initialContent={note.content}
-              isEditing={isEditing}
-              onCancel={() => setIsEditing(false)}
-              showCancelButton
-            />
-          ) : (
-            <div className="p-4">
-              <div
-                className="text-zinc-800 dark:text-zinc-900 prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: note.content }}
-              />
-            </div>
-          )}
+            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size={'icon'}
+                  onClick={() => setIsEditing(!isEditing)}
+                  disabled={isUpdating}
+                >
+                  {isEditing ? (
+                    <>
+                      <Save className="size-4" />
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 className="size-4" />
+                    </>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isEditing ? "Save changes" : "Edit note"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
-    </div >
+
+      <div
+        className="rounded-lg"
+        style={{
+          backgroundColor: note.color,
+          filter: 'contrast(0.95) brightness(var(--note-brightness, 1))'
+        }}
+      >
+        {isEditing ? (
+          <NoteEditor
+            syncId={syncId}
+            noteId={note.id}
+            type={note.is_pinned ? "pinned" : "notes"}
+            initialContent={note.content}
+            isEditing={isEditing}
+            onCancel={() => setIsEditing(false)}
+            showCancelButton
+          />
+        ) : (
+          <div className="p-4">
+            <div
+              className="text-zinc-800 dark:text-zinc-900 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: note.content }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
